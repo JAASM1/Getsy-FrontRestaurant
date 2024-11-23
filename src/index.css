@@ -1,0 +1,28 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.btn-primary {
+  @apply bg-primary font-Poppins font-semibold text-xl w-full max-w-xs h-12 flex justify-center items-center rounded-full;
+}
+.text-label{
+    @apply font-semibold text-sm text-[#888]
+}
+
+/* Oculta el ícono del reloj en navegadores WebKit */
+input[type="time"]::-webkit-calendar-picker-indicator {
+  display: none;
+  -webkit-appearance: none;
+}
+
+/* Opcional: Ocultar en Firefox */
+input[type="time"] {
+  -moz-appearance: textfield;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden; /* Opcional: previene el desplazamiento */
+}
