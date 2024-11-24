@@ -39,18 +39,18 @@ export default function ChangePassword() {
 
       if (response.ok) {
         setEmailSent(true);
-        setSuccessMessage("Email sent! Please enter the recovery code.");
+        setSuccessMessage("Email enviado. Por favor revisa tu correo.");
         setCountdown(30);
         setCanResend(false);
       } else {
         setErrors([
           data.message ||
-            "An unexpected error occurred. Please try again later.",
+            "Un error inesperado ha ocurrido. Intentalo de nuevo más tarde.",
         ]);
       }
     } catch (error) {
       console.error("Error sending recovery email:", error);
-      setErrors(["An unexpected error occurred. Please try again later."]);
+      setErrors(["Un error inesperado ha ocurrido. Intentalo de nuevo más tarde."]);
     }
   };
 
@@ -72,11 +72,11 @@ export default function ChangePassword() {
       if (response.ok) {
         navigate("/reset", { state: { email } });
       } else {
-        setErrors([data.message || "Invalid code. Please try again."]);
+        setErrors([data.message || "Código invalido. Por favor intenta de nuevo."]);
       }
     } catch (error) {
       console.error("Error validating recovery code:", error);
-      setErrors(["An unexpected error occurred. Please try again later."]);
+      setErrors(["Un error inesperado ha ocurrido. Intentalo de nuevo más tarde."]);
     }
   };
 
@@ -103,18 +103,18 @@ export default function ChangePassword() {
         const data = await response.json();
 
         if (response.ok) {
-          setSuccessMessage("New recovery code sent! Please check your email.");
+          setSuccessMessage("Nuevo código enviado! Por favor revisa tu email.");
           setCountdown(30);
           setCanResend(false);
         } else {
           setErrors([
             data.message ||
-              "An unexpected error occurred. Please try again later.",
+              "Un error inesperado ha ocurrido. Intentalo de nuevo más tarde.",
           ]);
         }
       } catch (error) {
         console.error("Error resending recovery code:", error);
-        setErrors(["An unexpected error occurred. Please try again later."]);
+        setErrors(["Un error inesperado ha ocurrido. Intentalo de nuevo más tarde."]);
       }
     }
   };

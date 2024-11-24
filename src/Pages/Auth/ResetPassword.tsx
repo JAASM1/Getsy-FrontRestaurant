@@ -38,12 +38,12 @@ export default function ResetPassword() {
       } else {
         setErrors([
           data.message ||
-            "An unexpected error occurred. Please try again later.",
+            "Un error inesperado ha ocurrido. Intentalo de nuevo más tarde.",
         ]);
       }
     } catch (error) {
-      console.error("Error resetting password:", error);
-      setErrors(["An unexpected error occurred. Please try again later."]);
+      console.error("Un error ocurrió cambiando la contraseña:", error);
+      setErrors(["Un error inesperado ha ocurrido. Intentalo de nuevo más tarde."]);
     }
   };
 
