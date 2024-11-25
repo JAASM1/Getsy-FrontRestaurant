@@ -10,10 +10,13 @@ import AuthLayout from "./Layouts/AuthLayout.tsx";
 import Home from "./Pages/Home.tsx";
 import Dashboard from "./Pages/DashBoard/Dashboard.tsx";
 import Reseñas from "./Pages/DashBoard/Reseñas.tsx";
+import Schedules from "./Pages/DashBoard/Schedules.tsx";
 import Login from "./Pages/Auth/Login/Login.tsx";
 import Register from "./Pages/Auth/Register.tsx";
 import FormLoginMobile from "./Pages/Auth/FormLoginMobile.tsx";
 import ChangePassword from "./Pages/Auth/ChangePassword.tsx";
+import TotalDailyBookings from "./Pages/DashBoard/TotalDailyBookings.tsx";
+import ReservationHistory from "./Pages/DashBoard/ReservationHistory.tsx";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -91,7 +94,7 @@ function App() {
               }
             />
             <Route
-              path="/reseñas"
+              path="/dashboard/reseñas"
               element={
                 <ProtectedRoute>
                   <Reseñas />
@@ -99,10 +102,26 @@ function App() {
               }
             />
             <Route
-              path="/horarios"
+              path="/dashboard/horarios"
               element={
                 <ProtectedRoute>
-                  <Reseñas />
+                  <Schedules />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/dashboard/total-daily-bookings"
+              element={
+                <ProtectedRoute>
+                  <TotalDailyBookings />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/dashboard/reservation-history"
+              element={
+                <ProtectedRoute>
+                  <ReservationHistory />
                 </ProtectedRoute>
               }
             />

@@ -17,157 +17,188 @@ interface ReservacionProps {
   userId: string;
 }
 
-interface client {
+interface Client {
   id: string;
   name: string;
   email: string;
   phone: string;
 }
 
-const NewReserves = () => {
+interface NewReservesProps {
+  onReservationUpdate: () => void;
+  searchName: string;
+}
+
+const NewReserves: React.FC<NewReservesProps> = ({
+  onReservationUpdate,
+  searchName,
+}) => {
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [reservations, setReservations] = useState<ReservacionProps[]>([]);
-  const [client, setClient] = useState<client[]>([]);
+  const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [option, setOption] = useState("");
 
-  const handleShowModal = () => {
-    setShowModal(true);
+  // Reutilizable: Manejo de errores
+  const handleError = (error: any, defaultMessage: string) => {
+    console.error(error);
+    setError(error?.message || defaultMessage);
+  };
+
+  // Reutilizable: Fetch general para obtener datos
+  const fetchData = async (url: string, headers?: object) => {
+    try {
+      const response = await axios.get(url, { headers });
+      return response.data;
+    } catch (error) {
+      handleError(error, `Error al obtener datos de ${url}`);
+      throw error;
+    }
+  };
+
+  // Reutilizable: Cargar clientes
+  const fetchClientsData = async (reservations: ReservacionProps[]) => {
+    try {
+      const clientResponses = await Promise.all(
+        reservations.map((res) =>
+          fetchData(`http://localhost:3000/getsy-back/get-user/${res.userId}`, {
+            "Content-Type": "application/json",
+          })
+        )
+      );
+      return clientResponses.map((res) => res.user);
+    } catch (error) {
+      handleError(error, "Error al cargar datos de clientes");
+      return [];
+    }
   };
 
   useEffect(() => {
-    const fetchRestaurant = async () => {
-      const adminId = localStorage.getItem("adminId");
-
-      if (!adminId) {
-        setError("No se encontró ID de administrador");
-        setLoading(false);
-        return;
-      }
-
+    const loadAllData = async () => {
       try {
-        const response = await axios.get(
+        const adminId = localStorage.getItem("adminId");
+        if (!adminId) {
+          setError("No se encontró ID de administrador");
+          setLoading(false);
+          return;
+        }
+
+        // Cargar datos del restaurante
+        const restaurantData: Restaurant[] = await fetchData(
           `http://localhost:3000/getsy-back/restaurants/admin/${adminId}`,
           {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           }
         );
-        setRestaurant(response.data[0]);
-      } catch (error) {
-        console.error(error);
-        setError("Hubo un error al cargar el restaurante");
-      }
-    };
-    fetchRestaurant();
-  }, []);
+        const restaurant = restaurantData[0];
+        setRestaurant(restaurant);
 
-  useEffect(() => {
-    const fetchReservations = async () => {
-      if (!restaurant) return;
-      try {
-        const response = await axios.get(
-          `http://localhost:3000/getsy-back/${restaurant?.id}/reservations-restaurant`,
+        // Cargar reservaciones
+        const reservationsData: ReservacionProps[] = await fetchData(
+          `http://localhost:3000/getsy-back/${restaurant.id}/reservations-restaurant`,
           {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           }
         );
-        const pendingReservations = response.data.filter(
-          (reservation: ReservacionProps) => reservation.status === "pending"
+        const pendingReservations = reservationsData.filter(
+          (reservation) => reservation.status === "pending"
         );
         setReservations(pendingReservations);
-      } catch (error) {
-        console.error(error);
-        setError("Hubo un error al cargar las reservaciones");
+
+        // Cargar clientes en base a reservaciones pendientes
+        const clientsData = await fetchClientsData(pendingReservations);
+        setClients(clientsData);
+      } catch {
+        // Los errores ya están manejados en las funciones reutilizables
       } finally {
         setLoading(false);
       }
     };
-    fetchReservations();
-  }, [restaurant]);
 
-  useEffect(() => {
-    const fetchClients = async () => {
-      if (reservations.length === 0) return;
-
-      try {
-        const clientResponses = await Promise.all(
-          reservations.map((res) =>
-            axios.get(
-              `http://localhost:3000/getsy-back/get-user/${res.userId}`,
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                },
-              }
-            )
-          )
-        );
-        const clientsData = clientResponses.map((res) => res.data.user);
-        setClient(clientsData);
-      } catch (err: any) {
-        console.error(err);
-        setError(err.message || "Error al obtener los datos de los clientes");
-      }
-    };
-
-    fetchClients();
-  }, [reservations]);
+    loadAllData();
+  }, []);
 
   if (loading) return <p>Cargando datos...</p>;
   if (error) return <p>Error: {error}</p>;
+
   return (
     <>
       <div className="space-y-3 max-md:pb-5">
-        {reservations.map((res) => {
-          const clientData = client.find((cli) => cli.id === res.userId);
+        {reservations.length === 0 ? (
+          <p className="text-gray-500 text-xl font-semibold">
+            No hay reservas por completar
+          </p>
+        ) : (
+          // Filtrar las reservas por el nombre de búsqueda
+          (() => {
+            const filteredReservations = reservations.filter((res) => {
+              const clientData = clients.find((cli) => cli.id === res.userId);
+              return clientData?.name
+                .toLowerCase()
+                .includes(searchName.toLowerCase());
+            });
 
-          return (
-            <div
-              key={res.id}
-              className="border border-primary p-2 rounded-lg shadow-md flex space-x-3 justify-between items-center bg-white"
-            >
-              {" "}
-              <div className="text-sm text-gray-600">
-                <p className="text-base font-semibold text-black">
-                  {clientData?.name}
+            if (filteredReservations.length === 0) {
+              return (
+                <p className="text-gray-500 text-xl font-semibold">
+                  Cliente no encontrado
                 </p>
-                <div className="flex space-x-2">
-                  <div className="flex space-x-1">
-                    <p>Día:</p>
-                    <div>
-                      <FechaFormateada fecha={res.date} />
+              );
+            }
+
+            return filteredReservations.map((res) => {
+              const clientData = clients.find((cli) => cli.id === res.userId);
+              return (
+                <div
+                  key={res.id}
+                  className="border border-primary p-2 rounded-lg shadow-md flex space-x-3 justify-between items-center bg-white"
+                >
+                  <div className="text-sm text-gray-600">
+                    <p className="text-base font-semibold text-black">
+                      {clientData?.name}
+                    </p>
+                    <div className="flex space-x-2">
+                      <div className="flex space-x-1">
+                        <p>Día:</p>
+                        <div>
+                          <FechaFormateada fecha={res.date} />
+                        </div>
+                      </div>
+                      <div className="flex space-x-1">
+                        <p>Hora:</p>
+                        <div>
+                          <HoraFormateada hora={res.time} />
+                        </div>
+                      </div>
                     </div>
+                    <p>Personas: {res.pax}</p>
                   </div>
-                  <div className="flex space-x-1">
-                    <p>Hora:</p>
-                    <div>
-                      <HoraFormateada hora={res.time} />
-                    </div>
-                  </div>
+                  <button
+                    onClick={() => {
+                      setShowModal(true);
+                      setSelectedUserId(res.userId);
+                      setOption("NewReservation");
+                    }}
+                    className="text-sm bg-primary mt-2 rounded px-3 py-1 font-semibold"
+                  >
+                    Ver más
+                  </button>
                 </div>
-                <p>Personas: {res.pax}</p>
-              </div>
-              <button
-                onClick={() => {
-                  setSelectedUserId(res.userId);
-                  handleShowModal();
-                }}
-                className="text-sm bg-primary mt-2 rounded px-3 py-1 font-semibold"
-              >
-                Ver más
-              </button>
-            </div>
-          );
-        })}
+              );
+            });
+          })()
+        )}
       </div>
       {showModal && (
-        <Modal userId={selectedUserId} setShowModal={setShowModal} />
+        <Modal
+          userId={selectedUserId}
+          setShowModal={setShowModal}
+          option={option}
+          onReservationUpdate={onReservationUpdate}
+        />
       )}
     </>
   );

@@ -3,10 +3,13 @@ import axios from "axios";
 import Swal from "sweetalert2";
 
 import { FechaFormateada, HoraFormateada, Label } from "../Ui";
+import { redirect } from "react-router-dom";
 
 interface ModalProps {
   setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
   userId: string | null;
+  option: string;
+  onReservationUpdate: () => void;
 }
 
 interface reserve {
@@ -28,7 +31,12 @@ interface event {
   name: string;
 }
 
-const Modal: React.FC<ModalProps> = ({ userId, setShowModal }) => {
+const Modal: React.FC<ModalProps> = ({
+  userId,
+  setShowModal,
+  option,
+  onReservationUpdate,
+}) => {
   const [reservationData, setReservationData] = useState<reserve[]>([]);
   const [client, setClient] = useState<client | null>(null);
   const [event, setEvent] = useState<event | null>(null);
@@ -62,27 +70,34 @@ const Modal: React.FC<ModalProps> = ({ userId, setShowModal }) => {
       }
       const response = await axios.patch(
         `http://localhost:3000/getsy-back/reservations/${reservationId}/update-status`,
-        { status: newStatus , userId: userId },
+        { status: newStatus, userId: userId },
         { headers: { "Content-Type": "application/json" } }
       );
 
-      setReservationData(prevData =>
-        prevData.map(reserve =>
-          reserve.id === reservationId
-            ? { ...response.data }
-            : reserve
+      setReservationData((prevData) =>
+        prevData.map((reserve) =>
+          reserve.id === reservationId ? { ...response.data } : reserve
         )
       );
       await Swal.fire({
         icon: "success",
         title:
-          newStatus === "confirmed" ? "Reserva aceptada" : "Reserva cancelada",
+          newStatus === "confirmed"
+            ? "Reserva aceptada"
+            : newStatus === "completed"
+            ? "Reserva conpletada"
+            : "Reserva cancelada",
         text:
           newStatus === "confirmed"
             ? "La reserva ha sido aceptada exitosamente"
+            : newStatus === "completed"
+            ? "La reserva ha sido completada exitosamente"
             : "La reserva ha sido cancelada exitosamente",
         confirmButtonColor: "#3085d6",
       });
+      if (onReservationUpdate) {
+        onReservationUpdate();
+      }
       setShowModal(false);
     } catch (error: any) {
       let errorMessage = "Error al actualizar el estado de la reserva";
@@ -92,10 +107,10 @@ const Modal: React.FC<ModalProps> = ({ userId, setShowModal }) => {
         errorMessage = error.message;
       }
       Swal.fire({
-        icon: 'error',
-        title: 'Error',
+        icon: "error",
+        title: "Error",
         text: errorMessage,
-        confirmButtonColor: '#3085d6',
+        confirmButtonColor: "#3085d6",
       });
     } finally {
       setUpdating(false);
@@ -104,8 +119,14 @@ const Modal: React.FC<ModalProps> = ({ userId, setShowModal }) => {
 
   const handleAccept = async (reservationId: number) => {
     const result = await Swal.fire({
-      title: "¿Aceptar esta reserva?",
-      text: "¿Estás seguro de que deseas aceptar esta reserva?",
+      title:
+        option === "reservation"
+          ? "¿Completar esta reserva?"
+          : "¿Aceptar esta reserva?",
+      text:
+        option === "reservation"
+          ? "¿El cliente llego al restaurante?"
+          : "¿Estás seguro de que deseas aceptar esta reserva?",
       icon: "question",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
@@ -115,7 +136,10 @@ const Modal: React.FC<ModalProps> = ({ userId, setShowModal }) => {
     });
 
     if (result.isConfirmed) {
-      await updateReservationStatus(reservationId, "confirmed");
+      await updateReservationStatus(
+        reservationId,
+        option === "reservation" ? "completed" : "confirmed"
+      );
     }
   };
 
@@ -224,7 +248,11 @@ const Modal: React.FC<ModalProps> = ({ userId, setShowModal }) => {
                   </div>
                   <div className="flex space-x-1 text-gray-600 text-sm">
                     <Label>Estado:</Label>
-                    <span className="text-black">{reserve.status}</span>
+                    <span className="text-black">
+                      {reserve.status === "confirmed"
+                        ? "Confirmada"
+                        : "Pendiente"}
+                    </span>
                   </div>
                   <div className="text-sm">
                     <Label>Detalles adicionales</Label>
@@ -233,12 +261,12 @@ const Modal: React.FC<ModalProps> = ({ userId, setShowModal }) => {
                     </div>
                   </div>
                 </div>
-                <div className="flex justify-between w-full">
+                <div className="flex justify-between w-full font-semibold">
                   <button
                     onClick={() => handleAccept(reserve.id)}
-                    className="px-3 py-1 bg-primary rounded"
+                    className="px-3 py-1 bg-primary hover:bg-yellow-300 rounded border-b-4 border-amber-500 hover:border-primary focus:bg-yellow-500 focus:border-none transition-all ease-in"
                   >
-                    Aceptar
+                    {option === "reservation" ? "Completar" : "Aceptar"}
                   </button>
                   <button
                     onClick={() => handleCancel(reserve.id)}

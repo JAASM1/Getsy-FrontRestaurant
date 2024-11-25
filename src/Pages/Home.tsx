@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useMediaQuery } from "react-responsive";
 import Reserves from "../Components/Reserves/Reserves";
 import NewReserves from "../Components/Reserves/NewReserves";
@@ -7,8 +7,13 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<"reserves" | "newReserves">(
     "reserves"
   );
-
   const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [searchName, setSearchName] = useState("");
+
+  const HandleReservationUpdate = useCallback(() => {
+    setRefreshKey((prev) => prev + 1);
+  }, []);
 
   return (
     <div className="flex flex-col justify-center items-center px-6 md:px-[6.25rem] w-full font-Poppins">
@@ -34,7 +39,12 @@ export default function Home() {
             </button>
           </div>
           <div className="border border-black bg-white flex items-center w-full px-1 rounded-md mb-4 md:mb-7 md:w-2/3">
-            <input type="text" className="w-full p-1 outline-none" />
+            <input
+              type="text"
+              className="w-full p-1 outline-none text-base"
+              placeholder="Buscar por el nombre del cliente"
+              onChange={(e) => setSearchName(e.target.value)}
+            />
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-6 w-6"
@@ -56,12 +66,16 @@ export default function Home() {
         <div className=" static">
           {activeTab === "reserves" && (
             <div className="w-full space-y-3">
-              <Reserves />
+              <Reserves key={refreshKey} searchName={searchName}/>
             </div>
           )}
           {activeTab === "newReserves" && (
             <div className="w-full space-y-3">
-              <NewReserves />
+              <NewReserves
+                key={refreshKey}
+                onReservationUpdate={HandleReservationUpdate}
+                searchName={searchName}
+              />
             </div>
           )}
         </div>
@@ -71,13 +85,17 @@ export default function Home() {
             <div className="w-full p-4 rounded-lg">
               <p className="font-semibold text-lg mb-1">Reservas</p>
               <div className="space-y-3">
-                <Reserves />
+                <Reserves key={refreshKey} searchName={searchName}/>
               </div>
             </div>
-            <div className="w-full bg-[#fff4c6] p-4 rounded-xl">
+            <div className="w-full p-4 rounded-xl bg-[#fff4c6]">
               <p className="font-semibold text-lg mb-1">Nuevas reservas</p>
               <div className="space-y-3">
-                <NewReserves />
+                <NewReserves
+                  key={refreshKey}
+                  onReservationUpdate={HandleReservationUpdate}
+                  searchName={searchName}
+                />
               </div>
             </div>
           </div>

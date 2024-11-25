@@ -9,7 +9,7 @@ export default function NavBar() {
   const navigate = useNavigate();
   const { logout } = useAuth();
   const [showLogoutModal, setShowLogoutModal] = useState<boolean>(false);
-  
+
   // Nuevo estado para el menú móvil
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
 
@@ -40,7 +40,7 @@ export default function NavBar() {
             <Link
               to={"/dashboard"}
               className={`${
-                location.pathname === "/dashboard"
+                location.pathname.startsWith("/dashboard")
                   ? "border-b-2 border-black"
                   : ""
               }`}

@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
-import { FechaFormateada, HoraFormateada } from "../Ui";
-import Modal from "./Modal";
+
+import { FechaFormateada, HoraFormateada } from "../../Components/Ui";
 
 interface Restaurant {
   id: string;
@@ -23,8 +24,8 @@ interface client {
   email: string;
   phone: string;
 }
-
-const Reserves: React.FC<{ searchName: string }> = ({ searchName }) => {
+const ReservationHistory = () => {
+  const [searchName, setSearchName] = useState("");
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [reservations, setReservations] = useState<ReservacionProps[]>([]);
   const [clients, setClients] = useState<client[]>([]);
@@ -88,12 +89,8 @@ const Reserves: React.FC<{ searchName: string }> = ({ searchName }) => {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         }
       );
-      const confirmedReservations = reservationsData.filter(
-        (reservation) => reservation.status === "confirmed"
-      );
-      setReservations(confirmedReservations);
-
-      const clientsData = await fetchClientsData(confirmedReservations);
+      setReservations(reservationsData);
+      const clientsData = await fetchClientsData(reservationsData);
       setClients(clientsData);
     } catch {
     } finally {
@@ -105,39 +102,92 @@ const Reserves: React.FC<{ searchName: string }> = ({ searchName }) => {
     loadReservations();
   }, []);
 
-  const handleReservationUpdate = () => {
-    loadReservations();
+  const filterReservationsByName = (
+    reservations: ReservacionProps[],
+    clients: client[],
+    searchName: string
+  ) => {
+    if (!searchName) return reservations;
+
+    return reservations.filter((res) => {
+      const clientData = clients.find((cli) => cli.id === res.userId);
+      return clientData?.name.toLowerCase().includes(searchName.toLowerCase());
+    });
   };
-
-  if (loading) return <p>Cargando datos...</p>;
-  if (error) return <p>Error: {error}</p>;
-
   return (
-    <>
-      <div className="space-y-3 max-md:pb-5">
-        {reservations.length === 0 ? (
-          <p className="text-gray-500 text-xl font-semibold">
-            No hay reservas por completar
-          </p>
-        ) : (
-          // Filtrar las reservas por el nombre de búsqueda
-          (() => {
-            const filteredReservations = reservations.filter((res) => {
-              const clientData = clients.find((cli) => cli.id === res.userId);
-              return clientData?.name
-                .toLowerCase()
-                .includes(searchName.toLowerCase());
-            });
-
-            if (filteredReservations.length === 0) {
+    <div className="flex flex-col justify-center items-center px-6 md:px-[3rem] w-full font-Poppins">
+      <div className="flex justify-between md:justify-normal w-full items-center mb-3 md:space-x-8">
+        <Link to="/dashboard" className="hover:bg-slate-200 rounded-full p-2">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="size-6"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
+            />
+          </svg>
+        </Link>
+        <h1 className="text-2xl font-bold">Historial de reservas</h1>
+      </div>
+      <div className="w-full md:flex items-center md:px-[4.5rem] mb-5">
+        <div className="w-full md:flex justify-end items-end max-md:space-y-1">
+          <div className="border border-black bg-white flex items-center w-full px-1 rounded-md md:w-2/5">
+            <input
+              type="text"
+              className="w-full p-1 outline-none text-base"
+              placeholder="Buscar por el nombre del cliente"
+              onChange={(e) => setSearchName(e.target.value)}
+            />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div className="w-full md:px-[4.5rem]">
+        <div className="space-y-3 max-md:pb-5">
+          {(() => {
+            if (reservations.length === 0) {
               return (
                 <p className="text-gray-500 text-xl font-semibold">
-                  Cliente no encontrado
+                  No hay reservas para el día de hoy
                 </p>
               );
             }
+            const filteredReservations = filterReservationsByName(
+              reservations,
+              clients,
+              searchName
+            );
+            if (filteredReservations.length === 0) {
+              return (
+                <p className="text-gray-500 text-xl font-semibold">
+                  No se encontraron reservas que coincidan con la búsqueda
+                </p>
+              );
+            }
+            const sortedReservations = filteredReservations.sort((a, b) =>
+              a.time.localeCompare(b.time)
+            );
 
-            return filteredReservations.map((res) => {
+            return sortedReservations.map((res) => {
               const clientData = clients.find((cli) => cli.id === res.userId);
               return (
                 <div
@@ -162,7 +212,27 @@ const Reserves: React.FC<{ searchName: string }> = ({ searchName }) => {
                         </div>
                       </div>
                     </div>
-                    <p>Personas: {res.pax}</p>
+                    <div className="flex space-x-2">
+                      <p>Personas: {res.pax}</p>
+                      <p>
+                        Estado:{" "}
+                        <span
+                          className={`font-medium ${
+                            res.status === "confirmed"
+                              ? "text-green-600"
+                              : res.status === "cancelled"
+                              ? "text-red-600"
+                              : "text-yellow-600"
+                          }`}
+                        >
+                          {res.status === "confirmed"
+                            ? "Confirmada"
+                            : res.status === "cancelled"
+                            ? "Cancelada"
+                            : "Pendiente"}
+                        </span>
+                      </p>
+                    </div>
                   </div>
                   <button
                     onClick={() => {
@@ -177,19 +247,11 @@ const Reserves: React.FC<{ searchName: string }> = ({ searchName }) => {
                 </div>
               );
             });
-          })()
-        )}
+          })()}
+        </div>
       </div>
-      {showModal && (
-        <Modal
-          userId={selectedUserId}
-          setShowModal={setShowModal}
-          option={option}
-          onReservationUpdate={handleReservationUpdate}
-        />
-      )}
-    </>
+    </div>
   );
 };
 
-export default Reserves;
+export default ReservationHistory;

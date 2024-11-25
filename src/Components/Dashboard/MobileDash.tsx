@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 export const MobileDash = () => {
   return (
     <div className="w-full flex flex-col space-y-5 md:hidden">
-      <Link className="bg-white border-2 border-primary rounded-xl flex items-center space-x-3 px-2 py-5 shadow-lg">
+      <Link to="/dashboard/total-daily-bookings" className="bg-white border-2 border-primary rounded-xl flex items-center space-x-3 px-2 py-5 shadow-lg">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           className="h-7 w-7"
@@ -21,7 +21,7 @@ export const MobileDash = () => {
         </svg>
         <p className="text-xl font-bold">Reservas del día</p>
       </Link>
-      <Link to="/reseñas" className="bg-white border-2 border-primary rounded-xl flex items-center space-x-3 px-2 py-5 shadow-lg">
+      <Link to="/dashboard/reseñas" className="bg-white border-2 border-primary rounded-xl flex items-center space-x-3 px-2 py-5 shadow-lg">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           className="h-7 w-7"
@@ -38,7 +38,7 @@ export const MobileDash = () => {
         </svg>
         <p className="text-xl font-bold">Reseñas</p>
       </Link>
-      <Link className="bg-white border-2 border-primary rounded-xl flex items-center space-x-3 px-2 py-5 shadow-lg">
+      <Link to="/dashboard/reservation-history" className="bg-white border-2 border-primary rounded-xl flex items-center space-x-3 px-2 py-5 shadow-lg">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           className="h-7 w-7"
@@ -55,7 +55,7 @@ export const MobileDash = () => {
         </svg>
         <p className="text-xl font-bold">Historial de reservas</p>
       </Link>
-      <Link className="bg-white border-2 border-primary rounded-xl flex items-center space-x-3 px-2 py-5 shadow-lg">
+      <Link to="/dashboard/horarios" className="bg-white border-2 border-primary rounded-xl flex items-center space-x-3 px-2 py-5 shadow-lg">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           className="h-7 w-7"
@@ -72,7 +72,7 @@ export const MobileDash = () => {
         </svg>
         <p className="text-xl font-bold">Horarios</p>
       </Link>
-      <Link className="bg-white border-2 border-primary rounded-xl flex items-center space-x-3 px-2 py-5 shadow-lg">
+      <Link to="/dashboard/perfil" className="bg-white border-2 border-primary rounded-xl flex items-center space-x-3 px-2 py-5 shadow-lg">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           className="h-7 w-7"

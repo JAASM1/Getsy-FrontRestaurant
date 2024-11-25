@@ -6,8 +6,8 @@
 .btn-primary {
   @apply bg-primary font-Poppins font-semibold text-xl w-full max-w-xs h-12 flex justify-center items-center rounded-full;
 }
-.text-label{
-    @apply font-semibold text-sm text-[#888]
+.text-label {
+  @apply font-semibold text-sm text-[#888];
 }
 
 /* Oculta el ícono del reloj en navegadores WebKit */
@@ -21,8 +21,10 @@ input[type="time"] {
   -moz-appearance: textfield;
 }
 
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
-  overflow: hidden; /* Opcional: previene el desplazamiento */
+  overflow: auto;
+  scrollbar-width: none;
 }

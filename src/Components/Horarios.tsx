@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { InputDate } from "./Ui";
 
 type DiaSemana =
@@ -15,9 +15,25 @@ interface HorariosProps {
     horarios: Record<DiaSemana, { abre: string; cierra: string }>
   ) => void;
   editable?: boolean;
+  initialHorarios?: Record<DiaSemana, { abre: string; cierra: string }>;
 }
 
-const Horarios = ({ onChange, editable = false }: HorariosProps) => {
+// Array ordenado de días
+const DIAS_ORDENADOS: DiaSemana[] = [
+  "lunes",
+  "martes",
+  "miercoles",
+  "jueves",
+  "viernes",
+  "sabado",
+  "domingo",
+];
+
+const Horarios = ({
+  onChange,
+  editable = false,
+  initialHorarios,
+}: HorariosProps) => {
   const [editando, setEditando] = useState<Record<DiaSemana, boolean>>({
     lunes: false,
     martes: false,
@@ -27,6 +43,7 @@ const Horarios = ({ onChange, editable = false }: HorariosProps) => {
     sabado: false,
     domingo: false,
   });
+
   const [horarios, setHorarios] = useState<
     Record<DiaSemana, { abre: string; cierra: string }>
   >({
@@ -38,6 +55,12 @@ const Horarios = ({ onChange, editable = false }: HorariosProps) => {
     sabado: { abre: "", cierra: "" },
     domingo: { abre: "", cierra: "" },
   });
+
+  useEffect(() => {
+    if (initialHorarios) {
+      setHorarios(initialHorarios);
+    }
+  }, [initialHorarios]);
 
   const handleHorarioChange = (
     dia: DiaSemana,
@@ -59,6 +82,15 @@ const Horarios = ({ onChange, editable = false }: HorariosProps) => {
     }));
   };
 
+  const handleReset = (dia: DiaSemana) => {
+    const nuevosHorarios = {
+      ...horarios,
+      [dia]: { abre: "", cierra: "" },
+    };
+    setHorarios(nuevosHorarios);
+    onChange(nuevosHorarios);
+  };
+
   return (
     <div className="flex flex-col w-full">
       <div>
@@ -73,14 +105,16 @@ const Horarios = ({ onChange, editable = false }: HorariosProps) => {
             !editable ? "grid-cols-3" : "grid-cols-4"
           } gap-4 items-center`}
         >
-          {/* Encabezados */}
           <div className="font-medium text-gray-600">Día</div>
           <div className="font-medium text-gray-600">Abre</div>
           <div className="font-medium text-gray-600">Cierra</div>
-          <div className="hidden"></div>
+          {editable && (
+            <div className="font-medium text-gray-600">Acciones</div>
+          )}
         </div>
 
-        {Object.keys(horarios).map((dia) => (
+        {/* Usamos el array ordenado para mapear los días */}
+        {DIAS_ORDENADOS.map((dia) => (
           <div
             key={dia}
             className={`grid ${
@@ -89,41 +123,28 @@ const Horarios = ({ onChange, editable = false }: HorariosProps) => {
           >
             <p className="text-gray-800 capitalize">{dia}</p>
             <InputDate
-              value={horarios[dia as DiaSemana].abre}
-              onChange={(e) =>
-                handleHorarioChange(dia as DiaSemana, "abre", e.target.value)
-              }
-              className={`${editable && editando[dia as DiaSemana] ? 'border-primary border-2' : ''}`}
+              value={horarios[dia].abre}
+              onChange={(e) => handleHorarioChange(dia, "abre", e.target.value)}
+              className={`${
+                editable && editando[dia] ? "border-primary border-2" : ""
+              }`}
             />
             <InputDate
-              value={horarios[dia as DiaSemana].cierra}
+              value={horarios[dia].cierra}
               onChange={(e) =>
-                handleHorarioChange(dia as DiaSemana, "cierra", e.target.value)
+                handleHorarioChange(dia, "cierra", e.target.value)
               }
-              className={`${editable && editando[dia as DiaSemana] ? 'border-primary border-2' : ''}`}
+              className={`${
+                editable && editando[dia] ? "border-primary border-2" : ""
+              }`}
             />
             {editable && (
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center">
                 <button
-                  onClick={() => toggleEditar(dia as DiaSemana)}
-                  className="hover:text-primary"
+                  type="button"
+                  onClick={() => handleReset(dia)}
+                  className="hover:text-red-600"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="size-5"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"
-                    />
-                  </svg>
-                </button>
-                <button className="hover:text-red-600">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"

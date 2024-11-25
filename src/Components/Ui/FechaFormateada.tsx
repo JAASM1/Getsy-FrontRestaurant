@@ -11,6 +11,7 @@ interface Props extends React.HTMLAttributes<HTMLParagraphElement> {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
+      timeZone: "UTC",
     });
   
     return <p>{fechaFormateada}</p>;
