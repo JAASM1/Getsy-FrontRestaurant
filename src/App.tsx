@@ -14,6 +14,7 @@ import Login from "./Pages/Auth/Login/Login.tsx";
 import Register from "./Pages/Auth/Register.tsx";
 import FormLoginMobile from "./Pages/Auth/FormLoginMobile.tsx";
 import ChangePassword from "./Pages/Auth/ChangePassword.tsx";
+import ResetPassword from "./Pages/Auth/ResetPassword.tsx";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -67,6 +68,14 @@ function App() {
               element={
                 <PublicRoute>
                   <ChangePassword />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="/reset-password"
+              element={
+                <PublicRoute>
+                  <ResetPassword />
                 </PublicRoute>
               }
             />
