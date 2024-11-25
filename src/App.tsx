@@ -15,6 +15,7 @@ import Login from "./Pages/Auth/Login/Login.tsx";
 import Register from "./Pages/Auth/Register.tsx";
 import FormLoginMobile from "./Pages/Auth/FormLoginMobile.tsx";
 import ChangePassword from "./Pages/Auth/ChangePassword.tsx";
+import ResetPassword from "./Pages/Auth/ResetPassword.tsx";
 import TotalDailyBookings from "./Pages/DashBoard/TotalDailyBookings.tsx";
 import ReservationHistory from "./Pages/DashBoard/ReservationHistory.tsx";
 import Profile from "./Pages/DashBoard/Profile.tsx";
@@ -72,6 +73,14 @@ function App() {
               element={
                 <PublicRoute>
                   <ChangePassword />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="/reset-password"
+              element={
+                <PublicRoute>
+                  <ResetPassword />
                 </PublicRoute>
               }
             />
