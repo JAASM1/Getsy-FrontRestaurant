@@ -1,10 +1,67 @@
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 import DailyReservationsBar from "./Graphics/DailyReservationsBar";
 import ReservationTypesPie from "./Graphics/ReservationTypesPie";
 import ReservationCounter from "./ReservationCounter";
 import ReviewViewer from "./ReviewViewer";
 
+import axios from "axios";
+interface Restaurant {
+  id: string;
+  name: string;
+}
+
 const DeskDash = () => {
+  const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [option, setOption] = useState("");
+
+  const handleError = (error: any, defaultMessage: string) => {
+    console.error(error);
+    setError(error?.message || defaultMessage);
+  };
+
+  const fetchData = async (url: string, headers?: object) => {
+    try {
+      const response = await axios.get(url, { headers });
+      return response.data;
+    } catch (error) {
+      handleError(error, `Error al obtener datos de ${url}`);
+      throw error;
+    }
+  };
+
+  const loadReservations = async () => {
+    try {
+      const adminId = localStorage.getItem("adminId");
+      if (!adminId) {
+        setError("No se encontró ID de administrador");
+        return;
+      }
+
+      const restaurantData: Restaurant[] = await fetchData(
+        `http://localhost:3000/getsy-back/restaurants/admin/${adminId}`,
+        {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        }
+      );
+      const restaurant = restaurantData[0];
+      setRestaurant(restaurant);
+      console.log(restaurant);
+      
+    } catch {
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadReservations();
+  }, []);
+
   return (
     <div className="max-md:hidden flex flex-col w-full pb-10 space-y-10">
       <div className="flex w-full text-sm font-medium space-x-20">
@@ -78,7 +135,7 @@ const DeskDash = () => {
           <p className="font-semibold">Perfil</p>
           <div className="border border-black rounded-lg h-[7rem] w-[10rem]">
             <Link
-              to="/"
+              to={`/dashboard/perfil/${restaurant?.id}`}
               className="w-full h-full flex items-center justify-center"
             >
               <svg

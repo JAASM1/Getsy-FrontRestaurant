@@ -17,6 +17,8 @@ import FormLoginMobile from "./Pages/Auth/FormLoginMobile.tsx";
 import ChangePassword from "./Pages/Auth/ChangePassword.tsx";
 import TotalDailyBookings from "./Pages/DashBoard/TotalDailyBookings.tsx";
 import ReservationHistory from "./Pages/DashBoard/ReservationHistory.tsx";
+import Profile from "./Pages/DashBoard/Profile.tsx";
+
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -122,6 +124,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <ReservationHistory />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/dashboard/perfil/:id"
+              element={
+                <ProtectedRoute>
+                  <Profile />
                 </ProtectedRoute>
               }
             />
