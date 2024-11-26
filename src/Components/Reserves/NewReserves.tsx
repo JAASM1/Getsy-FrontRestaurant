@@ -126,7 +126,7 @@ const NewReserves: React.FC<NewReservesProps> = ({
 
   return (
     <>
-      <div className="space-y-3 max-md:pb-5">
+      <div className="space-y-3 max-md:pb-5 bg-[#fff4c6] p-4 rounded-md">
         {reservations.length === 0 ? (
           <p className="text-gray-500 text-xl font-semibold">
             No hay reservas por completar

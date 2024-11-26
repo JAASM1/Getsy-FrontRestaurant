@@ -28,3 +28,7 @@ body {
   overflow: auto;
   scrollbar-width: none;
 }
+
+.reservation{
+  scrollbar-width: none;
+}

@@ -66,7 +66,7 @@ export default function Home() {
         <div className=" static">
           {activeTab === "reserves" && (
             <div className="w-full space-y-3">
-              <Reserves key={refreshKey} searchName={searchName}/>
+              <Reserves key={refreshKey} searchName={searchName} />
             </div>
           )}
           {activeTab === "newReserves" && (
@@ -81,21 +81,23 @@ export default function Home() {
         </div>
       ) : (
         <>
-          <div className="w-full flex space-x-10">
+          <div className="w-full flex space-x-10 h-full">
             <div className="w-full p-4 rounded-lg">
               <p className="font-semibold text-lg mb-1">Reservas</p>
               <div className="space-y-3">
-                <Reserves key={refreshKey} searchName={searchName}/>
+                <Reserves key={refreshKey} searchName={searchName} />
               </div>
             </div>
-            <div className="w-full p-4 rounded-xl bg-[#fff4c6]">
-              <p className="font-semibold text-lg mb-1">Nuevas reservas</p>
-              <div className="space-y-3">
-                <NewReserves
-                  key={refreshKey}
-                  onReservationUpdate={HandleReservationUpdate}
-                  searchName={searchName}
-                />
+            <div className="w-full rounded-xl p-4 h-full">
+              <div className="h-[32rem]">
+                <p className="font-semibold text-lg mb-1">Nuevas reservas</p>
+                <div className="space-y-3 h-full overflow-y-auto scroll-smooth reservation">
+                  <NewReserves
+                    key={refreshKey}
+                    onReservationUpdate={HandleReservationUpdate}
+                    searchName={searchName}
+                  />
+                </div>
               </div>
             </div>
           </div>
