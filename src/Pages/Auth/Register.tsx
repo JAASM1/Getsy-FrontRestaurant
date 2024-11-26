@@ -237,7 +237,9 @@ export default function Register() {
         horarios: scheduleData.horarios,
       };
 
-      await ValidationSchemaRegister.validate(combinedData, { abortEarly: false });
+      await ValidationSchemaRegister.validate(combinedData, {
+        abortEarly: false,
+      });
       setFormError("");
       setFieldErrors({});
 
@@ -278,7 +280,7 @@ export default function Register() {
           "Restaurante creado exitosamente:",
           responseRestaurant.data
         );
-        navigate("/");
+        navigate("/login");
       } catch (axiosError) {
         console.error(
           "Error en la creación de usuario o restaurante:",
