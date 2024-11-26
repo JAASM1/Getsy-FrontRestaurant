@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 
 import EditHorarios from "../../Components/Dashboard/EditHorarios";
-import Holydays from "../../Components/Dashboard/Holydays";
 
 const Schedules = () => {
   return (
@@ -23,12 +22,11 @@ const Schedules = () => {
         </Link>
 
         <h1 className="text-xl md:text-2xl font-bold">
-          Horarios y días especiales
+          Horarios de Atención
         </h1>
       </div>
-      <div className="flex max-md:flex-col max-md:space-y-10 w-full md:justify-center md:px-[13rem]">
+      <div className="flex max-md:flex-col max-md:space-y-10 w-full md:justify-center md:w-1/2 items-center">
         <EditHorarios />
-        <Holydays />
       </div>
     </div>
   );

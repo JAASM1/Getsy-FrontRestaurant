@@ -17,13 +17,14 @@ interface Review {
   userId: string;
   rating: number;
   description: string;
-  createdAt: string; // Asumiendo que las reseñas tienen una fecha de creación
+  createdAt: string;
 }
 
 const ReviewViewer = () => {
   const [latestReview, setLatestReview] = useState<Review | null>(null);
   const [client, setClient] = useState<Client | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [noReviews, setNoReviews] = useState<boolean>(false);
 
   const handleError = (error: any, defaultMessage: string) => {
     console.error(error);
@@ -71,6 +72,14 @@ const ReviewViewer = () => {
         }
       );
 
+      // Verificar si hay reseñas
+      if (reviews.length === 0) {
+        setNoReviews(true);
+        setLatestReview(null);
+        setClient(null);
+        return;
+      }
+
       // Obtener la reseña más reciente comparando con la fecha actual
       const latest = reviews.reduce((closest, current) => {
         const closestDiff = getTimeDifference(closest.createdAt);
@@ -79,6 +88,7 @@ const ReviewViewer = () => {
       }, reviews[0]);
 
       if (latest) {
+        setNoReviews(false);
         setLatestReview(latest);
         // Obtener datos del cliente
         const clientData = await fetchData(
@@ -135,6 +145,26 @@ const ReviewViewer = () => {
   }, []);
 
   if (error) return null;
+
+  // Renderizado cuando no hay reseñas
+  if (noReviews) {
+    return (
+      <div className="w-2/3 space-y-1">
+        <p className="font-semibold">Reseñas</p>
+        <div className="border border-black rounded-lg p-3 h-[9.5rem] flex flex-col items-center justify-center text-gray-500">
+          <p>No hay reseñas disponibles</p>
+          <Link
+            to="/dashboard/reseñas"
+            className="mt-3 bg-gray-300 px-7 py-1 rounded-lg text-xs"
+          >
+            Ir a Reseñas
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // Renderizado cuando hay reseñas
   if (!latestReview || !client) return null;
   return (
     <div className="w-2/3 space-y-1">

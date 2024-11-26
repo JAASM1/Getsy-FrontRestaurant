@@ -1,10 +1,10 @@
 import { PieChart, Pie, Tooltip, Cell, ResponsiveContainer, Legend } from "recharts";
 
 const reservationTypesData = [
-  { name: "Fiesta de Cumpleaños", value: 30 },
-  { name: "Cena Romántica", value: 20 },
-  { name: "Reunión Familiar", value: 25 },
-  { name: "Negocios", value: 15 },
+  { name: "Fiesta de Cumpleaños", value: 5 },
+  { name: "Cena Romántica", value: 2 },
+  { name: "Reunión Familiar", value: 3 },
+  { name: "Negocios", value: 4 },
 ];
 
 const ReservationTypesPie = () => {

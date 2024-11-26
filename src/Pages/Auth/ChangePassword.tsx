@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Logo from "../../Assets/GetsyRestaurants.png";
-import ButtonLogin from "../../Components/Ui/Button";
+import {Button} from "../../Components/Ui";
 
 export default function ChangePassword() {
   const [email, setEmail] = useState("");
@@ -27,7 +27,7 @@ export default function ChangePassword() {
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:8080/getsy-back/user/recovery-send", {
+      const response = await fetch("http://localhost:3000/getsy-back/user/recovery-send", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -59,7 +59,7 @@ export default function ChangePassword() {
     console.log(email);
     const recoveryCode = code.join("");
     try {
-      const response = await fetch("http://localhost:8080/getsy-back/user/recovery-validate", {
+      const response = await fetch("http://localhost:3000/getsy-back/user/recovery-validate", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -70,7 +70,7 @@ export default function ChangePassword() {
       const data = await response.json();
 
       if (response.ok) {
-        navigate("/reset", { state: { email } });
+        navigate("/reset-password", { state: { email } });
       } else {
         setErrors([data.message || "Código invalido. Por favor intenta de nuevo."]);
       }
@@ -92,7 +92,7 @@ export default function ChangePassword() {
   const handleResendCode = async () => {
     if (canResend) {
       try {
-        const response = await fetch("http://localhost:8080/getsy-back/user/recovery-send", {
+        const response = await fetch("http://localhost:3000/getsy-back/user/recovery-send", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -120,7 +120,7 @@ export default function ChangePassword() {
   };
 
   return (
-    <div className="flex flex-col h-screen justify-between items-center bg-white font-Poppins p-10">
+    <div className="flex flex-col h-screen justify-between md:justify-normal items-center bg-white font-Poppins p-10">
       <img
         src={Logo}
         alt="GetsyRestaurants"
@@ -132,7 +132,7 @@ export default function ChangePassword() {
           className="flex flex-col w-full justify-center items-center space-y-4"
         >
           <p className="text-center">
-            Ingresa tu correo electronico para recibir un codgio de confirmacion
+            Ingresa tu correo electronico para <br /> recibir un codgio de confirmacion
           </p>
           <div className="flex flex-col w-full max-w-xs">
             <label htmlFor="email" className="text-label">
@@ -153,21 +153,21 @@ export default function ChangePassword() {
               ))}
             </div>
           )}
-          <ButtonLogin type="submit">Enviar codigo</ButtonLogin>
+          <Button>Enviar codigo</Button>
         </form>
       ) : (
         <form className="flex flex-col w-full justify-center items-center space-y-4" onSubmit={handleCodeSubmit}>
           <p className="text-center">
             {successMessage}
           </p>
-          <div className="flex flex-col w-full max-w-xs">
+          <div className="flex justify-evenly w-full max-w-xs">
             {code.map((value, index) => (
               <input
                 key={index}
                 type="text"
                 value={value}
                 onChange={(e) => handleCodeChange(e, index)}
-                className="p-2 border rounded-[5px] h-10 w-10 text-center"
+                className="p-2 border rounded-[5px] h-10 w-10 text-center border-gray-600"
               />
             ))}
           </div>
@@ -178,8 +178,8 @@ export default function ChangePassword() {
               ))}
             </div>
           )}
-          <div className="flex justify-center mt-12">
-            <ButtonLogin type="submit">Confirmar</ButtonLogin>
+          <div className="flex justify-center mt-12 w-full">
+            <Button>Confirmar</Button>
           </div>
           <div className="text-center mt-6">
             {canResend ? (

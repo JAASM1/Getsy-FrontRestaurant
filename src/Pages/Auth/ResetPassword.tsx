@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Logo from "../../Assets/GetsyRestaurants.png";
-import ButtonLogin from "../../Components/Ui/Button";
+import { Button, Label } from "../../Components/Ui";
 
 export default function ResetPassword() {
   const [password, setPassword] = useState("");
@@ -23,13 +23,16 @@ export default function ResetPassword() {
     }
 
     try {
-      const response = await fetch("http://localhost:8080/getsy-back/user/recovery-post", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, newPassword: password }),
-      });
+      const response = await fetch(
+        "http://localhost:3000/getsy-back/user/recovery-post",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, newPassword: password }),
+        }
+      );
 
       const data = await response.json();
 
@@ -43,12 +46,14 @@ export default function ResetPassword() {
       }
     } catch (error) {
       console.error("Un error ocurrió cambiando la contraseña:", error);
-      setErrors(["Un error inesperado ha ocurrido. Intentalo de nuevo más tarde."]);
+      setErrors([
+        "Un error inesperado ha ocurrido. Intentalo de nuevo más tarde.",
+      ]);
     }
   };
 
   return (
-    <div className="flex flex-col h-screen justify-between items-center bg-white font-Poppins p-10">
+    <div className="flex flex-col h-screen justify-between md:justify-normal items-center bg-white font-Poppins p-10">
       <img
         src={Logo}
         alt="GetsyRestaurants"
@@ -56,18 +61,18 @@ export default function ResetPassword() {
       />
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col w-full justify-center items-center space-y-4"
+        className="flex flex-col w-full justify-center items-center space-y-4 md:w-1/4"
       >
-        <div className="password-input font-rubik text-xs mb-10">
+        <div className="password-input font-rubik text-xs w-full">
           <div className="label mb-2 flex">
-            <p className="font-rubik mr-1">Password</p>
+            <p>Password</p>
           </div>
-          <div className="relative">
+          <div className="relative w-full">
             <input
               type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full h-12 rounded-lg border border-black outline-primary px-2 py-3"
+              className="w-full h-10 rounded-lg border border-black outline-primary px-3 py-2 placeholder:text-gray-600"
               required
             />
             {showPassword ? (
@@ -120,16 +125,16 @@ export default function ResetPassword() {
             )}
           </div>
         </div>
-        <div className="password-input font-rubik text-xs mb-6">
+        <div className="password-input font-rubik text-xs w-full">
           <div className="label mb-2 flex">
-            <p className="font-rubik mr-1">Confirm password</p>
+            <p>Confirma tu contraseña</p>
           </div>
           <div className="relative">
             <input
               type={showConfirmPassword ? "text" : "password"}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full h-12 rounded-lg border border-black outline-primary px-2 py-3"
+              className="w-full h-10 rounded-lg border border-black outline-primary px-3 py-2 placeholder:text-gray-600"
               required
             />
             {showConfirmPassword ? (
@@ -189,13 +194,7 @@ export default function ResetPassword() {
             ))}
           </div>
         )}
-        <div className="flex justify-center mt-10">
-          <ButtonLogin
-            type="submit"
-          >
-            Reset Password
-          </ButtonLogin>
-        </div>
+        <Button>Reset Password</Button>
       </form>
     </div>
   );

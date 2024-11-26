@@ -15,9 +15,7 @@ const DeskDash = () => {
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showModal, setShowModal] = useState(false);
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
-  const [option, setOption] = useState("");
+
 
   const handleError = (error: any, defaultMessage: string) => {
     console.error(error);
